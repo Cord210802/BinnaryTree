@@ -251,87 +251,100 @@ public class ArbolAVL <T extends Comparable<T>> {
         }
         return actual;
     }
-
-    public T borra (T elem){
+    public T remove (T elem){
         NodoAVL <T> actual = busca(elem);
         NodoAVL <T> hijo;
+        NodoAVL <T> elimina = actual.papa;
+        int fact = 0;
         NodoAVL <T> aux;
-        NodoAVL <T> eliminado = null;
-        NodoAVL <T> papa = null;
-        boolean termine = false;
         T temp;
         if (actual == null){
             throw new RuntimeException();
         }
         temp = actual.dato;
-        eliminado = actual;
-        papa = eliminado.papa;
         if(actual.izquierda == null && actual.derecha == null){
             if(actual.equals(raiz)){
                 raiz = null;
+
             }
             if (actual.dato.compareTo(actual.papa.dato)<=0){
                 actual.papa.izquierda = null;
+                fact = 1;
             }
             else{
                 actual.papa.derecha = null;
+                fact = -1;
             }
         }
-        if (actual.izquierda == null || actual.derecha == null){
-            if (actual.izquierda == null){
-                hijo = actual.derecha;
-                eliminado = hijo;
-            }
-            else{
-                hijo = actual.izquierda;
-                eliminado = hijo;
-            }
-            if (actual.equals(raiz)){
-                raiz = hijo;
-            }
-            else{
-                actual.papa.cuelga(hijo);
-            }
-        }
-        if (actual.izquierda != null &&  actual.derecha != null){
-            aux = actual.derecha;
-            while(aux.izquierda != null){
-                aux = aux.izquierda;
-            }
-            actual.dato = aux.dato;
-            if (aux != actual.derecha){
-                papa = aux.papa;
-                aux.papa.izquierda = aux.derecha;
-                if (aux.derecha != null){
-                    eliminado = aux.papa.izquierda;
-                    aux.derecha.papa = aux.papa;
+        else{
+            if(actual.izquierda == null || actual.derecha == null){
+                if (actual.izquierda == null){
+                    hijo = actual.derecha;
+                }
+                else{
+                    hijo = actual.izquierda;
+                }
+                if (actual.equals(raiz)){
+                    raiz = hijo;
+                    elimina = raiz;
+                }
+                else{
+                    if(actual.dato.compareTo(actual.papa.dato)<=0){
+                        fact = 1;
+                    }
+                    else {
+                        fact = -1;
+                    }
+                    actual.papa.cuelga(hijo);
                 }
             }
-            else{
-                papa = aux.papa;
-                aux.papa.derecha = aux.derecha;
-                if (aux.derecha != null){
-                    eliminado = aux.papa.derecha;
-                    aux.derecha.papa = aux.papa;
+            if (actual.izquierda != null &&  actual.derecha != null){
+                aux = actual.derecha;
+                while(aux.izquierda != null){
+                    aux = aux.izquierda;
+                }
+                actual.dato = aux.dato;
+                elimina = aux.papa;
+                if (aux != actual.derecha){
+                    aux.papa.izquierda = aux.derecha;
+                    fact = 1;
+                    if (aux.derecha != null){
+                        aux.derecha.papa = aux.papa;
+                    }
+                }
+                else{
+                    fact = -1;
+                    aux.papa.derecha = aux.derecha;
+                    if (aux.derecha != null){
+                        aux.derecha.papa = aux.papa;
+                    }
                 }
             }
+
         }
-        while (!termine && papa != null){
-            if(eliminado == papa.derecha){
-                papa.factorEquilibrio -= 1;
-            }
-            else{
-                papa.factorEquilibrio +=1;
-            }
-            if(Math.abs(papa.factorEquilibrio) == 1){
-                termine = true;
-            }
-            if(Math.abs(papa.factorEquilibrio)== 2){
-                papa= rotacion(papa);
-            }
-            eliminado = papa;
-            papa = eliminado.papa;
-        }
+        termine(elimina, fact);
         return temp;
+    }
+
+    private void termine(NodoAVL<T> elimina, int fact) {
+        if (elimina == null){
+            return;
+        }
+        else {
+            elimina.factorEquilibrio += fact;
+            while(elimina != null && Math.abs(elimina.factorEquilibrio) != 1){
+                if (Math.abs(elimina.factorEquilibrio)==2){
+                    elimina = rotacion(elimina);
+                }
+                if(elimina.papa != null && elimina == elimina.papa.derecha){
+                    elimina.papa.factorEquilibrio -= 1;
+                }
+                if(elimina.papa != null && elimina == elimina.papa.izquierda){
+                    elimina.papa.factorEquilibrio += 1;
+                }
+                elimina = elimina.papa;
+            }
+        }
+
     }
 }

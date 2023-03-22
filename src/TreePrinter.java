@@ -110,15 +110,20 @@ public class TreePrinter <T extends Comparable<T>>{
 
     public static void main(String[] args) {
         ArbolAVL<Integer> datos = new ArbolAVL();
-        int[] arre = {9,8,15,7,13,20,10};
-        int[] borra = {8};
+        BinarySearch<Integer> bs = new BinarySearch();
+        bs.add(50);
+        bs.add(25);
+        bs.add(60);
+        bs.remove(60);
+        int[] arre = {100,200,300,250,375,280,290};
+        int[] borra = {290,200,100};
         for(int i =0; i< arre.length; i++) {
             datos.inserta(arre[i]);
         }
         print(datos.raiz);
         for(int i =0; i< borra.length; i++) {
-            datos.borra(borra[i]);
+            datos.remove(borra[i]);
+            print(datos.raiz);
         }
-        print(datos.raiz);
     }
 }
